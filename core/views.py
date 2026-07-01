@@ -1,10 +1,10 @@
 from django.shortcuts import render
-import jdatetime
+from core.utils import jalali_now
 from django.http import HttpResponseBadRequest
 from core.services.elapsed import get_elapsed
 
 def get_time(request):
-    now = jdatetime.datetime.now()
+    now = jalali_now()
     formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")
     context = {'time': formatted_now}
     
@@ -12,7 +12,7 @@ def get_time(request):
     
 
 def elapsed_view(request, pk):
-    now = jdatetime.datetime.now()
+    now = jalali_now()
     value = get_elapsed(pk, now)
 
     if not value:

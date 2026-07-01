@@ -1,4 +1,4 @@
-import jdatetime
+from core.utils import jalali_now
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
@@ -12,7 +12,7 @@ class TimeAPIView(APIView):
         responses={200: TimeSerializer}
     )
     def get(self, request):
-        now = jdatetime.datetime.now()
+        now = jalali_now()
         formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")
         data = {"time": formatted_now}
 
@@ -27,7 +27,7 @@ class ElapsedAPIView(APIView):
         responses={200: ElapsedSerializer}
     )
     def get(self, request, pk):
-        now = jdatetime.datetime.now()
+        now = jalali_now()
         data = {'value': elapsed.get_elapsed(pk, now)}
 
         if data["value"] is None:
@@ -44,7 +44,7 @@ class DateTrackerAPIView(APIView):
         responses={200, DateTrackerSerializer}
     )
     def get(self, request, pk):
-        now = jdatetime.datetime.now()
+        now = jalali_now()
 
         data = {'date_tracker': elapsed.waiit(pk, now)}
 
