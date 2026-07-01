@@ -52,3 +52,19 @@ def get_elapsed(pk, now):
         return None
 
     return func(now)
+
+def waiit(pk, now):
+    '''Where am I in time?'''
+    mapping = {
+        'y': lambda x: x.yday(),
+        'm': lambda x: x.day,
+        'w': lambda x: x.weekday() + 1,
+        'd': lambda x: x.hour,
+    }
+
+    output = mapping.get(pk)
+
+    if not output:
+        return None
+
+    return output(now)

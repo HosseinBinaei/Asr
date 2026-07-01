@@ -3,7 +3,6 @@ import jdatetime
 from django.http import HttpResponseBadRequest
 from core.services.elapsed import get_elapsed
 
-
 def get_time(request):
     now = jdatetime.datetime.now()
     formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")

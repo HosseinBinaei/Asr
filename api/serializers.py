@@ -6,3 +6,6 @@ class TimeSerializer(serializers.Serializer):
 
 class ElapsedSerializer(serializers.Serializer):
     value = serializers.CharField()
+
+class DateTrackerSerializer(serializers.Serializer):
+    date_tracker = serializers.CharField()
