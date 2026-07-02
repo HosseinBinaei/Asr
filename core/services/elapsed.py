@@ -21,7 +21,6 @@ def elapsed_month(now):
     elapsed_days = (now-start).days
     total_days = (end-start).days
 
-
     return elapsed(elapsed_days, total_days)
 
 
@@ -39,7 +38,7 @@ def elapsed_day(now):
     (minutes passed since midnight) * 100 / (24 * 60)'''
     return elapsed(now.minute + now.hour * 60, 24 * 60)
 
-def get_elapsed(pk, now):
+def get_elapsed(now, pk=None):
     mapping = {
         'y': elapsed_year,
         'm': elapsed_month,
@@ -47,13 +46,16 @@ def get_elapsed(pk, now):
         'd': elapsed_day,
     }
 
-    func = mapping.get(pk)
-    if not func:
-        return None
+    if pk is not None:
+        output = mapping.get(pk)
+        if output is None:
+            return None
+        return output(now)
+            
+    return {k: v(now) for k, v in mapping.items()}
 
-    return func(now)
 
-def waiit(pk, now):
+def waiit(now, pk=None):
     '''Where am I in time?'''
     mapping = {
         'y': lambda x: x.yday(),
@@ -61,10 +63,10 @@ def waiit(pk, now):
         'w': lambda x: x.weekday() + 1,
         'd': lambda x: x.hour,
     }
-
-    output = mapping.get(pk)
-
-    if not output:
-        return None
-
-    return output(now)
+    if pk is not None:
+        output = mapping.get(pk)
+        if output is None:
+            return None
+        return output(now)
+            
+    return {k: v(now) for k, v in mapping.items()}

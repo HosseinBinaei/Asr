@@ -1,11 +1,8 @@
 from rest_framework import serializers
 
-
 class TimeSerializer(serializers.Serializer):
-    time = serializers.CharField()
+    now = serializers.JSONField()
 
 class ElapsedSerializer(serializers.Serializer):
-    value = serializers.CharField()
-
-class DateTrackerSerializer(serializers.Serializer):
-    date_tracker = serializers.CharField()
+    now = serializers.JSONField()
+    elapsed = serializers.JSONField()
