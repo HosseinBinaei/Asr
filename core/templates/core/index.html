@@ -1,52 +1,630 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jalali Calendar Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .date-display {
-            font-size: 1.5rem;
-            color: #2c3e50;
-            background: #ecf0f1;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>داشبورد زمان</title>
+    <link
+      href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css"
+      rel="stylesheet"
+    />
 
-    <div class="card">
-        <h1>خوش آمدید</h1>
-        <p>زمان و تاریخ فعلی:</p>
-        
-        <div class="date-display">
-            {{ time }}
+    <style>
+      :root {
+        --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        --card-bg: rgba(255, 255, 255, 0.8);
+        --card-border: rgba(255, 255, 255, 0.4);
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --shadow:
+          0 10px 30px -5px rgba(0, 0, 0, 0.05),
+          0 4px 12px -2px rgba(0, 0, 0, 0.03);
+        --glow-strength: 0.12;
+      }
+
+      body.dark {
+        --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        --card-bg: rgba(30, 41, 59, 0.7);
+        --card-border: rgba(255, 255, 255, 0.08);
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+        --glow-strength: 0.25;
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: Vazirmatn, sans-serif;
+        margin: 0;
+        padding: 0;
+        transition:
+          background 0.4s ease,
+          color 0.4s ease,
+          border-color 0.4s ease,
+          box-shadow 0.4s ease;
+      }
+
+      body {
+        background: var(--bg-gradient);
+        color: var(--text-primary);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .wrap {
+        width: 100%;
+        max-width: 900px;
+        margin: auto;
+      }
+
+      /* Header styling */
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 0 8px;
+      }
+
+      .top h2 {
+        font-size: 24px;
+        font-weight: 850;
+        letter-spacing: -0.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .top h2::before {
+        content: "";
+        display: inline-block;
+        width: 6px;
+        height: 24px;
+        background: #3b82f6;
+        border-radius: 4px;
+      }
+
+      /* Theme toggle button styling */
+      .theme-btn {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        color: var(--text-primary);
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+      }
+
+      .theme-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .theme-btn svg {
+        width: 22px;
+        height: 22px;
+        fill: currentColor;
+        transform: rotate(0);
+        transition: transform 0.5s ease;
+      }
+
+      body.dark .theme-btn svg {
+        transform: rotate(360deg);
+      }
+
+      /* Base card style */
+      .card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 28px;
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        margin-bottom: 24px;
+      }
+
+      /* Time & Date Grid Container */
+      .time-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 24px;
+      }
+
+      /* Individual Time/Date Box Styling */
+      .time-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        position: relative;
+        overflow: hidden;
+        padding: 24px;
+        margin-bottom: 0;
+      }
+
+      .time-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 120px;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      /* Elegant glowing hints based on box types */
+      .time-card.type-time::after {
+        background: linear-gradient(
+          90deg,
+          rgba(59, 130, 246, 0.08) 0%,
+          rgba(59, 130, 246, 0) 100%
+        );
+      }
+
+      .time-card.type-date::after {
+        background: linear-gradient(
+          90deg,
+          rgba(16, 185, 129, 0.08) 0%,
+          rgba(16, 185, 129, 0) 100%
+        );
+      }
+
+      .time-info h3 {
+        font-size: 14px;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+
+      .time-val {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        direction: ltr; /* Keeps dates/time aligned beautifully in a standard order */
+        text-align: right;
+      }
+
+      .time-card.type-time .time-val {
+        color: #3b82f6;
+      }
+
+      .time-card.type-date .time-val {
+        color: #10b981;
+      }
+
+      .clock-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .time-card.type-time .clock-icon {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+      }
+
+      .time-card.type-date .clock-icon {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+      }
+
+      .clock-icon svg {
+        width: 26px;
+        height: 26px;
+        fill: currentColor;
+      }
+
+      /* Circle meters grid layout */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 20px;
+      }
+
+      /* Individual Progress Wrapper */
+      .progress-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .progress-container {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .progress-container svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+
+      .bg {
+        fill: none;
+        stroke: var(--card-border);
+        stroke-width: 8px;
+      }
+
+      .meter {
+        fill: none;
+        stroke-width: 8px;
+        stroke-linecap: round;
+        stroke-dasharray: 314.16;
+        stroke-dashoffset: 314.16;
+        transition:
+          stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+          stroke 0.6s ease;
+      }
+
+      /* Centering percentage text perfectly in HTML */
+      .percent {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 20px;
+        letter-spacing: -0.5px;
+        user-select: none;
+        transition: color 0.6s ease;
+      }
+
+      /* Labels & values styled dynamically */
+      .label {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+      }
+
+      .tracker-val {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: rgba(0, 0, 0, 0.03);
+        padding: 4px 12px;
+        border-radius: 30px;
+        border: 1px solid var(--card-border);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 4px;
+        direction: ltr; /* Keeps fractions aligned properly like 12 / 24 */
+      }
+
+      body.dark .tracker-val {
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      /* Accent glow styling based on progress item color */
+      .progress-card::before {
+        content: "";
+        position: absolute;
+        top: -10%;
+        left: -10%;
+        width: 120%;
+        height: 120%;
+        background: radial-gradient(
+          circle at center,
+          var(--accent-glow) 0%,
+          transparent 60%
+        );
+        opacity: var(--glow-strength);
+        pointer-events: none;
+        transition:
+          opacity 0.4s ease,
+          background 0.6s ease;
+      }
+
+      @media (max-width: 640px) {
+        .time-grid {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+        .grid {
+          grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+          gap: 12px;
+        }
+        .progress-card {
+          padding: 16px 8px;
+        }
+        .progress-container {
+          width: 95px;
+          height: 95px;
+          margin-bottom: 12px;
+        }
+        .bg,
+        .meter {
+          stroke-width: 9px;
+        }
+        .percent {
+          font-size: 16px;
+        }
+        .label {
+          font-size: 14px;
+        }
+        .tracker-val {
+          font-size: 11px;
+          padding: 3px 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- Header -->
+      <div class="top">
+        <h2>داشبورد زمان</h2>
+        <button id="theme" class="theme-btn" aria-label="تغییر تم">
+          <!-- Moon Icon (for dark mode conversion) -->
+          <svg id="theme-icon" viewBox="0 0 24 24">
+            <path
+              d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.38 5.38 0 0 1-4.4 2.26 5.4 5.4 0 0 1-5.4-5.4c0-1.81 1-3.39 2.45-4.2A9.11 9.11 0 0 0 12 3z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Time and Date Cards (Separated into two beautiful columns) -->
+      <div class="time-grid">
+        <!-- Time Card -->
+        <div class="card time-card type-time">
+          <div class="time-info">
+            <h3>ساعت فعلی</h3>
+            <div id="current-time" class="time-val">در حال بارگذاری...</div>
+          </div>
+          <div class="clock-icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.2 14.2L11 13V7h1.5v5.2l4.5 2.7-.8 1.3z"
+              />
+            </svg>
+          </div>
         </div>
+
+        <!-- Date Card -->
+        <div class="card time-card type-date">
+          <div class="time-info">
+            <h3>تاریخ امروز</h3>
+            <div id="current-date" class="time-val">در حال بارگذاری...</div>
+          </div>
+          <div class="clock-icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metric Cards Grid -->
+      <div class="card">
+        <div class="grid" id="circles"></div>
+      </div>
     </div>
 
-</body>
+    <script>
+      const BASE_URL = "https://asr-vfc7.onrender.com";
+      const items = [
+        ["سال", "y"],
+        ["ماه", "m"],
+        ["هفته", "w"],
+        ["روز", "d"],
+      ];
+
+      // Year=365, Month=30, Week=7, Day=24 (hours)
+      const maxTotals = {
+        y: 365,
+        m: 30,
+        w: 7,
+        d: 24,
+      };
+
+      // Get dynamic colors based on the current percentage
+      function getProgressColor(percent) {
+        if (percent <= 25) {
+          // Low: Green
+          return {
+            color: "#10b981",
+            glow: "rgba(16, 185, 129, 0.15)",
+          };
+        } else if (percent <= 60) {
+          // Medium-Low: Yellow/Amber
+          return {
+            color: "#f59e0b",
+            glow: "rgba(245, 158, 11, 0.15)",
+          };
+        } else if (percent <= 85) {
+          // Medium-High: Orange
+          return {
+            color: "#f97316",
+            glow: "rgba(249, 115, 22, 0.15)",
+          };
+        } else {
+          // High/Near completion: Red
+          return {
+            color: "#ef4444",
+            glow: "rgba(239, 68, 68, 0.15)",
+          };
+        }
+      }
+
+      // Convert Latin numbers to Persian digits beautifully
+      function toPersianDigits(str) {
+        if (str === undefined || str === null) return "";
+        const farsiDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+        return str
+          .toString()
+          .replace(/[0-9]/g, (w) => farsiDigits[+w])
+          .replace(/\./g, "٫")
+          .replace(/\//g, " / "); // Add comfortable spacing around slashes
+      }
+
+      // Reformat dates to keep "Year / Month / Day" order in RTL visually
+      function formatPersianDate(dateStr) {
+        if (!dateStr || dateStr === "-") return "-";
+
+        // Match standard format Year/Month/Day (e.g., 1405/04/11)
+        const parts = dateStr.split("/");
+        if (parts.length === 3) {
+          const [year, month, day] = parts;
+          // Rearrange to keep Year on the left and Day on the right in LTR container
+          return toPersianDigits(`${year}/${month}/${day}`);
+        }
+        return toPersianDigits(dateStr);
+      }
+
+      // Generate HTML Grid Elements dynamically
+      const c = document.getElementById("circles");
+      items.forEach(([t, id]) => {
+        c.innerHTML += `
+          <div id="card_${id}" class="progress-card">
+            <div class="progress-container">
+              <svg viewBox="0 0 120 120">
+                <circle class="bg" cx="60" cy="60" r="50"></circle>
+                <circle id="c_${id}" class="meter" cx="60" cy="60" r="50"></circle>
+              </svg>
+              <div class="percent" id="p_${id}">۰٪</div>
+            </div>
+            <div class="label">${t}</div>
+            <div class="tracker-val" id="val_${id}">در حال بارگذاری...</div>
+          </div>
+        `;
+      });
+
+      // Update Meter progress stroke, color and text based on dynamically calculated percentage
+      function setP(id, v) {
+        const l = 314.16; // 2 * pi * r (50)
+        const offset = l - (l * v) / 100;
+
+        const styleInfo = getProgressColor(v);
+
+        // Apply progress color
+        const meterElement = document.getElementById("c_" + id);
+        const percentElement = document.getElementById("p_" + id);
+        const cardElement = document.getElementById("card_" + id);
+
+        meterElement.style.stroke = styleInfo.color;
+        meterElement.style.strokeDashoffset = offset;
+        percentElement.style.color = styleInfo.color;
+
+        // Update glow effect behind card
+        cardElement.style.setProperty("--accent-glow", styleInfo.glow);
+
+        // Update Percent string
+        percentElement.textContent = toPersianDigits(v.toFixed(1)) + "٪";
+      }
+
+      async function j(u) {
+        return (await fetch(u)).json();
+      }
+
+      // Main Load Function
+      async function load() {
+        try {
+          // Fetching the entire unified data in one call
+          const data = await j(BASE_URL + "/api/elapsed/?format=json");
+
+          // 1. Set current time and date
+          const timeStr = data.now?.time || "-";
+          const dateStr = data.now?.date || "-";
+
+          document.getElementById("current-time").textContent =
+            toPersianDigits(timeStr);
+          document.getElementById("current-date").textContent =
+            formatPersianDate(dateStr);
+
+          // 2. Load metrics
+          for (let k of ["y", "m", "w", "d"]) {
+            const currentVal = data.elapsed?.value?.[k] ?? 0;
+            const percentVal = data.elapsed?.percent?.[k] ?? 0;
+            const totalVal = maxTotals[k];
+
+            // Update tracker label below the circle (e.g. 104 / 365)
+            document.getElementById("val_" + k).textContent = toPersianDigits(
+              `${currentVal}/${totalVal}`,
+            );
+
+            // Update Circle Percentage Loader and Dynamic Color
+            setP(k, Number(percentVal));
+          }
+        } catch (e) {
+          console.error("Error fetching data:", e);
+          document.getElementById("current-time").textContent = "خطا در اتصال";
+          document.getElementById("current-date").textContent = "خطا در اتصال";
+          document
+            .querySelectorAll(".tracker-val")
+            .forEach((el) => (el.textContent = "خطای بارگذاری"));
+        }
+      }
+
+      // Theme toggle implementation
+      const themeBtn = document.getElementById("theme");
+      const themeIcon = document.getElementById("theme-icon");
+
+      const sunSvg = `<path d="M12 7a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 2a3 3 0 1 1-3 3 3 3 0 0 1 3-3zm0-5a1 1 0 0 0 1-1V2a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1zm0 16a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1zm8.49-13.08a1 1 0 0 0-1.41 0l-.71.71a1 1 0 0 0 1.41 1.41l.71-.71a1 1 0 0 0 0-1.41zm-14.8 14.8a1 1 0 0 0-1.41 0l-.71.71a1 1 0 0 0 1.41 1.41l.71-.71a1 1 0 0 0 0-1.41zM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2zM4 11H3a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2zm14.49 4.9a1 1 0 0 0-1.41 0l-.71.71a1 1 0 0 0 1.41 1.41l.71-.71a1 1 0 0 0 0-1.41zm-14.8-14.8a1 1 0 0 0-1.41 0l-.71.71a1 1 0 0 0 1.41 1.41l.71-.71a1 1 0 0 0 0-1.41z"/>`;
+      const moonSvg = `<path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.38 5.38 0 0 1-4.4 2.26 5.4 5.4 0 0 1-5.4-5.4c0-1.81 1-3.39 2.45-4.2A9.11 9.11 0 0 0 12 3z"/>`;
+
+      function setTheme(mode) {
+        if (mode === "dark") {
+          document.body.classList.add("dark");
+          themeIcon.innerHTML = sunSvg;
+          localStorage.theme = "dark";
+        } else {
+          document.body.classList.remove("dark");
+          themeIcon.innerHTML = moonSvg;
+          localStorage.theme = "light";
+        }
+      }
+
+      themeBtn.onclick = () => {
+        const isDark = document.body.classList.contains("dark");
+        setTheme(isDark ? "light" : "dark");
+      };
+
+      // Set initial theme based on system preference or storage
+      if (
+        localStorage.theme === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        setTheme("dark");
+      } else {
+        setTheme("light");
+      }
+
+      // Initial fetch and schedule periodic updates
+      load();
+      setInterval(load, 30000);
+    </script>
+  </body>
 </html>
