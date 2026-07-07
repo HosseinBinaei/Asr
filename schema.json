@@ -1,0 +1,460 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "API",
+        "description": "API",
+        "version": "v1"
+    },
+    "basePath": "/api",
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Token Access: Bearer <your_token>"
+        }
+    },
+    "security": [
+        {
+            "Bearer": []
+        }
+    ],
+    "paths": {
+        "/auth/login/": {
+            "post": {
+                "operationId": "auth_login_create",
+                "description": "Takes a set of user credentials and returns an access and refresh JSON web\ntoken pair to prove the authentication of those credentials.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TokenObtainPair"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/TokenObtainPair"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/logout/": {
+            "post": {
+                "operationId": "auth_logout_create",
+                "description": "Takes a token and blacklists it. Must be used with the\n`rest_framework_simplejwt.token_blacklist` app installed.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TokenBlacklist"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/TokenBlacklist"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/register/": {
+            "post": {
+                "operationId": "auth_register_create",
+                "description": "New user registration with dedicated fields",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Register"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "successfully"
+                    },
+                    "400": {
+                        "description": "Error"
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/token/refresh/": {
+            "post": {
+                "operationId": "auth_token_refresh_create",
+                "description": "Takes a refresh type JSON web token and returns an access type JSON web\ntoken if the refresh token is valid.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TokenRefresh"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/TokenRefresh"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/elapsed/": {
+            "get": {
+                "operationId": "elapsed_list",
+                "description": "Get elapsed value based on key",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Elapsed"
+                        }
+                    }
+                },
+                "tags": [
+                    "elapsed"
+                ]
+            },
+            "parameters": []
+        },
+        "/elapsed/{id}": {
+            "get": {
+                "operationId": "elapsed_read",
+                "description": "Get elapsed value based on key",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Elapsed"
+                        }
+                    }
+                },
+                "tags": [
+                    "elapsed"
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ]
+        },
+        "/note/": {
+            "get": {
+                "operationId": "note_list",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Note"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "note"
+                ]
+            },
+            "post": {
+                "operationId": "note_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Note"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Note"
+                        }
+                    }
+                },
+                "tags": [
+                    "note"
+                ]
+            },
+            "parameters": []
+        },
+        "/note/{date}": {
+            "get": {
+                "operationId": "note_list",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Note"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "note"
+                ]
+            },
+            "post": {
+                "operationId": "note_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Note"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Note"
+                        }
+                    }
+                },
+                "tags": [
+                    "note"
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "date",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ]
+        },
+        "/time": {
+            "get": {
+                "operationId": "time_list",
+                "description": "Get current Jalali time",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Time"
+                        }
+                    }
+                },
+                "tags": [
+                    "time"
+                ]
+            },
+            "parameters": []
+        }
+    },
+    "definitions": {
+        "TokenObtainPair": {
+            "required": [
+                "email",
+                "password"
+            ],
+            "type": "object",
+            "properties": {
+                "email": {
+                    "title": "Email",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "password": {
+                    "title": "Password",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "TokenBlacklist": {
+            "required": [
+                "refresh"
+            ],
+            "type": "object",
+            "properties": {
+                "refresh": {
+                    "title": "Refresh",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "Register": {
+            "required": [
+                "password",
+                "email",
+                "first_name"
+            ],
+            "type": "object",
+            "properties": {
+                "password": {
+                    "title": "Password",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "email": {
+                    "title": "Email",
+                    "type": "string",
+                    "format": "email",
+                    "minLength": 1
+                },
+                "first_name": {
+                    "title": "First name",
+                    "type": "string",
+                    "maxLength": 150,
+                    "minLength": 1
+                },
+                "last_name": {
+                    "title": "Last name",
+                    "type": "string",
+                    "maxLength": 150
+                }
+            }
+        },
+        "TokenRefresh": {
+            "required": [
+                "refresh"
+            ],
+            "type": "object",
+            "properties": {
+                "refresh": {
+                    "title": "Refresh",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "access": {
+                    "title": "Access",
+                    "type": "string",
+                    "readOnly": true,
+                    "minLength": 1
+                }
+            }
+        },
+        "Elapsed": {
+            "required": [
+                "now",
+                "elapsed"
+            ],
+            "type": "object",
+            "properties": {
+                "now": {
+                    "title": "Now",
+                    "type": "object"
+                },
+                "elapsed": {
+                    "title": "Elapsed",
+                    "type": "object"
+                }
+            }
+        },
+        "Note": {
+            "required": [
+                "title",
+                "content",
+                "created_at"
+            ],
+            "type": "object",
+            "properties": {
+                "id": {
+                    "title": "ID",
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "title": {
+                    "title": "Title",
+                    "type": "string",
+                    "maxLength": 255,
+                    "minLength": 1
+                },
+                "content": {
+                    "title": "Content",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "note_type": {
+                    "title": "Note type",
+                    "type": "string",
+                    "enum": [
+                        "note",
+                        "reminder"
+                    ]
+                },
+                "created_at": {
+                    "title": "Created at",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "Time": {
+            "required": [
+                "now"
+            ],
+            "type": "object",
+            "properties": {
+                "now": {
+                    "title": "Now",
+                    "type": "object"
+                }
+            }
+        }
+    }
+}
